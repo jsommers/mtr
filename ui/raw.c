@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -39,7 +40,9 @@ void raw_rawxmit(
     int host,
     int seq)
 {
-    printf("x %d %d\n", host, seq);
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    printf("x %d %d %d.%06d\n", host, seq, tv.tv_sec, tv.tv_usec);
     fflush(stdout);
 }
 
@@ -52,6 +55,8 @@ void raw_rawping(
 {
     static int havename[MaxHost];
     char *name;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
 
     if (ctl->dns && !havename[host]) {
         name = dns_lookup2(ctl, net_addr(host));
@@ -60,7 +65,7 @@ void raw_rawping(
             printf("d %d %s\n", host, name);
         }
     }
-    printf("p %d %d %d\n", host, msec, seq);
+    printf("p %d %d %d %d.%06d\n", host, msec, seq, tv.tv_sec, tv.tv_usec);
     fflush(stdout);
 }
 
